@@ -1,0 +1,496 @@
+---
+// web/src/components/Hero.astro
+interface Props {
+  headerBadge?: string;
+  hero: {
+    pillBadge?: string;
+    title: string;
+    description: string;
+    githubUrl?: string;
+    snippetButtonText?: string;
+  };
+  demoBar?: {
+    showDemo?: boolean;
+    label?: string;
+  };
+}
+
+const { headerBadge, hero, demoBar } = Astro.props;
+---
+
+<!-- Top Navigation Header -->
+<nav class="top-nav" aria-label="Main Navigation">
+  <div class="container nav-container">
+    <div class="nav-brand">
+      <div class="brand-icon" aria-hidden="true">⚡</div>
+      <span class="brand-text">FlashProof Sales Popup for Woo</span>
+    </div>
+    {headerBadge && <div class="header-pill">{headerBadge}</div>}
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<header class="hero-wrapper">
+  <div class="container hero-container">
+    {hero.pillBadge && (
+      <div class="pill-badge" aria-label="Plugin specification">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>{hero.pillBadge}</span>
+      </div>
+    )}
+
+    <h1 class="hero-title">{hero.title}</h1>
+    <p class="hero-desc">{hero.description}</p>
+
+    <div class="hero-actions">
+      <a href={hero.githubUrl || "https://github.com/MichaelNnahDev/flashproof-sales-popup-for-woo.git"} class="btn btn-github" target="_blank" rel="noopener noreferrer">
+        <svg class="btn-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+        Download from GitHub
+      </a>
+
+      <a href="#lead-capture" class="btn btn-outline">
+        <span class="code-bracket" aria-hidden="true">&lt;&nbsp;&gt;</span>
+        {hero.snippetButtonText || "Get Raw WPCode Snippet"}
+      </a>
+    </div>
+
+    {demoBar?.showDemo && (
+      <nav class="demo-bar" aria-label="Interactive popup preview controls">
+        <span class="demo-label">{demoBar.label || "Interactive Demo:"}</span>
+        <div class="demo-buttons">
+          <button type="button" class="btn-demo" id="btn-demo-single">Preview Single Item</button>
+          <button type="button" class="btn-demo" id="btn-demo-multi">Preview Multi-Item Sale</button>
+          <button type="button" class="btn-demo" id="btn-demo-pos">Position: Bottom-Left</button>
+        </div>
+      </nav>
+    )}
+  </div>
+</header>
+
+<!-- Floating Live Social Proof Demo Popup Card -->
+<div id="wclsp-toast" class="wclsp-toast pos-bottom-left" role="status" aria-live="polite">
+  <div class="wclsp-img-box">
+    <img 
+      id="wclsp-img" 
+      src="/demo/demo-product-1.avif" 
+      alt="Purchased item thumbnail" 
+      width="44" 
+      height="44"
+      loading="eager"
+    />
+  </div>
+  <div class="wclsp-content">
+    <p class="wclsp-buyer">
+      <span id="wclsp-name">Michael N.</span> 
+      <span class="wclsp-flag" id="wclsp-flag">NG</span> 
+      <span class="wclsp-loc" id="wclsp-loc">from Port Harcourt just bought</span>
+    </p>
+    <p class="wclsp-product" id="wclsp-product">Somto Ankara/Asooke Kaftan</p>
+    <div class="wclsp-footer">
+      <span class="wclsp-time" id="wclsp-time">34 minutes ago</span>
+      <span class="wclsp-verified">
+        <svg viewBox="0 0 16 16" width="12" height="12" fill="#10b981" aria-hidden="true">
+          <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
+        </svg>
+        Verified
+      </span>
+    </div>
+  </div>
+  <button type="button" class="wclsp-close" id="wclsp-close" aria-label="Dismiss notification">&times;</button>
+</div>
+
+<script>
+  interface DemoItem {
+    name: string;
+    flag: string;
+    location: string;
+    product: string;
+    time: string;
+    img: string;
+  }
+
+  const demoData: Record<'single' | 'multi', DemoItem> = {
+    single: {
+      name: 'Michael N.',
+      flag: 'NG',
+      location: 'from Port Harcourt just bought',
+      product: 'Somto Ankara/Asooke Kaftan',
+      time: '34 minutes ago',
+      img: '/demo/demo-product-1.avif',
+    },
+    multi: {
+      name: 'Fatima F.',
+      flag: 'NG',
+      location: 'from Lagos just bought',
+      product: 'Matte Flask (500ml) and 2 other items',
+      time: '12 minutes ago',
+      img: '/demo/demo-product-2.avif',
+    },
+  };
+
+  const toast = document.getElementById('wclsp-toast');
+  const btnSingle = document.getElementById('btn-demo-single');
+  const btnMulti = document.getElementById('btn-demo-multi');
+  const btnPos = document.getElementById('btn-demo-pos');
+  const btnClose = document.getElementById('wclsp-close');
+
+  const imgEl = document.getElementById('wclsp-img') as HTMLImageElement | null;
+  const nameEl = document.getElementById('wclsp-name');
+  const flagEl = document.getElementById('wclsp-flag');
+  const locEl = document.getElementById('wclsp-loc');
+  const prodEl = document.getElementById('wclsp-product');
+  const timeEl = document.getElementById('wclsp-time');
+
+  let isLeft = true;
+  let timer: any = null;
+
+  function renderToast(item: DemoItem) {
+    if (!toast) return;
+
+    if (imgEl) imgEl.src = item.img;
+    if (nameEl) nameEl.textContent = item.name;
+    if (flagEl) flagEl.textContent = item.flag;
+    if (locEl) locEl.textContent = item.location;
+    if (prodEl) prodEl.textContent = item.product;
+    if (timeEl) timeEl.textContent = item.time;
+
+    toast.classList.remove('active');
+    clearTimeout(timer);
+
+    requestAnimationFrame(() => {
+      toast.classList.add('active');
+      timer = setTimeout(() => {
+        toast.classList.remove('active');
+      }, 5500);
+    });
+  }
+
+  // Initial trigger after 1 second
+  setTimeout(() => {
+    renderToast(demoData.single);
+  }, 1000);
+
+  btnSingle?.addEventListener('click', () => renderToast(demoData.single));
+  btnMulti?.addEventListener('click', () => renderToast(demoData.multi));
+
+  btnClose?.addEventListener('click', () => {
+    toast?.classList.remove('active');
+    clearTimeout(timer);
+  });
+
+  btnPos?.addEventListener('click', () => {
+    if (!toast || !btnPos) return;
+    isLeft = !isLeft;
+    if (isLeft) {
+      toast.classList.remove('pos-bottom-right');
+      toast.classList.add('pos-bottom-left');
+      btnPos.textContent = 'Position: Bottom-Left';
+    } else {
+      toast.classList.remove('pos-bottom-left');
+      toast.classList.add('pos-bottom-right');
+      btnPos.textContent = 'Position: Bottom-Right';
+    }
+  });
+</script>
+
+<style>
+  /* Top Nav */
+  .top-nav {
+    padding: 24px 0 12px;
+  }
+
+  .nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-icon {
+    width: 28px;
+    height: 28px;
+    background: #6366f1;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  .brand-text {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #0f172a;
+  }
+
+  .header-pill {
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #eef2ff;
+    color: #4f46e5;
+    padding: 5px 12px;
+    border-radius: 9999px;
+    border: 1px solid #e0e7ff;
+  }
+
+  /* Hero */
+  .hero-wrapper {
+    padding: 48px 0 36px;
+    text-align: center;
+  }
+
+  .hero-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .pill-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    margin-bottom: 28px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #10b981;
+  }
+
+  .hero-title {
+    font-size: clamp(2.1rem, 4.5vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    color: #0b0f19;
+    margin-bottom: 20px;
+  }
+
+  .hero-desc {
+    font-size: 1.05rem;
+    color: #475569;
+    line-height: 1.65;
+    max-width: 740px;
+    margin: 0 auto 32px;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 36px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .btn-github {
+    background: #0f172a;
+    color: #fff;
+  }
+
+  .btn-github:hover {
+    background: #000;
+  }
+
+  .btn-outline {
+    background: #fff;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+  }
+
+  .btn-outline:hover {
+    background: #f8fafc;
+  }
+
+  .code-bracket {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: #64748b;
+  }
+
+  /* Interactive Demo Control Bar */
+  .demo-bar {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .demo-label {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .demo-buttons {
+    display: flex;
+    gap: 6px;
+  }
+
+  .btn-demo {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 9999px;
+    padding: 5px 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #334155;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .btn-demo:hover {
+    background: #f1f5f9;
+  }
+
+  /* Floating Toast Social Proof Card */
+  .wclsp-toast {
+    position: fixed;
+    bottom: 24px;
+    z-index: 1000;
+    background: #111827;
+    color: #f9fafb;
+    border: 1px solid #1f2937;
+    border-radius: 10px;
+    padding: 12px 14px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    min-width: 290px;
+    max-width: 340px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+  }
+
+  .wclsp-toast.pos-bottom-left {
+    left: 24px;
+  }
+
+  .wclsp-toast.pos-bottom-right {
+    right: 24px;
+    left: auto;
+  }
+
+  .wclsp-toast.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .wclsp-img-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #1f2937;
+  }
+
+  .wclsp-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .wclsp-content {
+    flex: 1;
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+
+  .wclsp-buyer {
+    color: #9ca3af;
+  }
+
+  .wclsp-buyer strong, #wclsp-name {
+    font-weight: 700;
+    color: #fbbf24;
+  }
+
+  .wclsp-flag {
+    display: inline-block;
+    background: #374151;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 0.65rem;
+    color: #f3f4f6;
+    margin: 0 2px;
+  }
+
+  .wclsp-product {
+    font-weight: 600;
+    color: #f9fafb;
+    margin: 2px 0 4px;
+  }
+
+  .wclsp-footer {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    font-size: 0.7rem;
+    color: #9ca3af;
+  }
+
+  .wclsp-verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: #10b981;
+    font-weight: 600;
+  }
+
+  .wclsp-close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: transparent;
+    border: none;
+    color: #6b7280;
+    font-size: 1rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 4px;
+  }
+
+  .wclsp-close:hover {
+    color: #f9fafb;
+  }
+</style>

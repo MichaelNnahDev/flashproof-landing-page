@@ -1,0 +1,281 @@
+---
+// web/src/components/Comparison.astro
+interface ComparisonRow {
+  parameter: string;
+  flashproof: string;
+  hasCheck?: boolean;
+  saas: string;
+  bloated: string;
+}
+
+interface Props {
+  comparison: {
+    tag?: string;
+    title?: string;
+    subtitle?: string;
+    disclaimer?: string;
+    rows?: ComparisonRow[];
+  };
+}
+
+const { comparison } = Astro.props;
+
+// Fallback rows ensure the table renders even if CMS fields are not yet published
+const fallbackRows: ComparisonRow[] = [
+  {
+    parameter: "Monthly Cost",
+    flashproof: "100% Free Forever",
+    hasCheck: false,
+    saas: "$10 – $40+ / month (Recurring)",
+    bloated: "Free tier with paid Pro locks ($49–$99/yr)",
+  },
+  {
+    parameter: "Monthly Visitor / Order Limits",
+    flashproof: "Unlimited (Zero Caps)",
+    hasCheck: true,
+    saas: "Strictly capped (1,000–25,000 visits)",
+    bloated: "Unlimited (Self-hosted)",
+  },
+  {
+    parameter: "External Cloud Dependency",
+    flashproof: "None (100% Native WooCommerce)",
+    hasCheck: true,
+    saas: "Requires syncing orders to external cloud",
+    bloated: "None",
+  },
+  {
+    parameter: "Frontend Script Footprint",
+    flashproof: "< 3 KB (Pure Vanilla JS)",
+    hasCheck: true,
+    saas: "~30–70 KB external tracking scripts",
+    bloated: "Heavy (Loads jQuery + bloated UI assets)",
+  },
+  {
+    parameter: "Customer Data Privacy",
+    flashproof: "Stays on your private server",
+    hasCheck: true,
+    saas: "Customer names & orders stored externally",
+    bloated: "Stays on your server",
+  },
+  {
+    parameter: "Mobile Layout Clearance",
+    flashproof: "Custom px offsets (Floats over chats)",
+    hasCheck: true,
+    saas: "Fixed placement (Often covers mobile buttons)",
+    bloated: "Basic positioning only",
+  },
+];
+
+const displayRows = comparison?.rows && comparison.rows.length > 0 ? comparison.rows : fallbackRows;
+---
+
+<section class="comparison-section" aria-labelledby="comparison-heading">
+  <div class="container">
+    <div class="section-header">
+      {comparison?.tag && <span class="section-tag">{comparison.tag}</span>}
+      <h2 id="comparison-heading" class="section-title">{comparison?.title || "Native WordPress & WooCommerce vs. Hosted SaaS Tools"}</h2>
+      {comparison?.subtitle && <p class="section-subtitle">{comparison.subtitle}</p>}
+    </div>
+
+    <div class="table-container">
+      <div class="table-card" tabindex="0" role="region" aria-label="Architecture Comparison Table">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th scope="col" class="th-param">Key Parameter</th>
+              <th scope="col" class="th-recommended">
+                <div class="recommended-header">
+                  <span class="rec-badge">RECOMMENDED</span>
+                  <span class="rec-title">FlashProof (Our Plugin)</span>
+                </div>
+              </th>
+              <th scope="col" class="th-other">Typical Hosted SaaS Services</th>
+              <th scope="col" class="th-other">Bloated Multi-Tool Plugins</th>
+            </tr>
+          </thead>
+          <tbody>
+            {displayRows.map((row) => (
+              <tr>
+                <th scope="row" class="td-param">{row.parameter}</th>
+                <td class="td-recommended">
+                  <div class="recommended-cell">
+                    {row.hasCheck && (
+                      <svg class="check-icon" viewBox="0 0 16 16" width="14" height="14" fill="#059669" aria-hidden="true">
+                        <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
+                      </svg>
+                    )}
+                    <span>{row.flashproof}</span>
+                  </div>
+                </td>
+                <td class="td-other">{row.saas}</td>
+                <td class="td-other">{row.bloated}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {comparison?.disclaimer && (
+      <p class="table-disclaimer">{comparison.disclaimer}</p>
+    )}
+  </div>
+</section>
+
+<style>
+  .comparison-section {
+    padding: 70px 0 60px;
+    background: transparent;
+  }
+
+  .section-header {
+    text-align: center;
+    max-width: 780px;
+    margin: 0 auto 36px;
+  }
+
+  .section-tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #4f46e5;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-size: clamp(1.8rem, 3.8vw, 2.75rem);
+    font-weight: 800;
+    color: #0b0f19;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+    margin-bottom: 14px;
+  }
+
+  .section-subtitle {
+    color: #64748b;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .table-container {
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  .table-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow-x: auto;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+  }
+
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.88rem;
+  }
+
+  .comparison-table th,
+  .comparison-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+  }
+
+  .comparison-table tr:last-child td,
+  .comparison-table tr:last-child th {
+    border-bottom: none;
+  }
+
+  .th-param {
+    font-weight: 700;
+    color: #0f172a;
+    width: 25%;
+  }
+
+  .th-recommended {
+    background: #f5f3ff;
+    width: 32%;
+    border-left: 1px solid #e0e7ff;
+    border-right: 1px solid #e0e7ff;
+  }
+
+  .recommended-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .rec-badge {
+    background: #4f46e5;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    letter-spacing: 0.05em;
+  }
+
+  .rec-title {
+    font-weight: 700;
+    color: #1e1b4b;
+    font-size: 0.88rem;
+  }
+
+  .th-other {
+    font-weight: 700;
+    color: #0f172a;
+    width: 21.5%;
+  }
+
+  .td-param {
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  .td-recommended {
+    background: #f5f3ff;
+    font-weight: 700;
+    color: #3730a3;
+    border-left: 1px solid #e0e7ff;
+    border-right: 1px solid #e0e7ff;
+  }
+
+  .recommended-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .check-icon {
+    flex-shrink: 0;
+  }
+
+  .td-other {
+    color: #334155;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  .table-disclaimer {
+    margin-top: 18px;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    .comparison-table {
+      font-size: 0.8rem;
+    }
+    .comparison-table th,
+    .comparison-table td {
+      padding: 12px 14px;
+    }
+  }
+</style>

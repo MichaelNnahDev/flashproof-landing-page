@@ -1,0 +1,40 @@
+---
+// src/pages/index.astro
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import Features from '../components/Features.astro';
+import Comparison from '../components/Comparison.astro';
+import TerminalAndLead from '../components/TerminalAndLead.astro';
+import { sanityClient } from '../lib/sanity';
+
+// Query full published landing page document
+const query = `*[_type == "landingPage"][0]`;
+const pageData = await sanityClient.fetch(query);
+
+if (!pageData) {
+  throw new Error("Landing Page document not found in Sanity. Please create and publish it.");
+}
+---
+
+<Layout title={pageData.hero?.title || "FlashProof Sales Popup for Woo"}>
+  <main id="main-content">
+    <Hero
+      headerBadge={pageData.headerBadge}
+      hero={pageData.hero}
+      demoBar={pageData.demoBar}
+    />
+
+    {pageData.features?.length > 0 && (
+      <Features features={pageData.features} />
+    )}
+
+    {pageData.comparison && (
+      <Comparison comparison={pageData.comparison} />
+    )}
+
+    <TerminalAndLead
+      terminal={pageData.terminal}
+      leadCapture={pageData.leadCapture}
+    />
+  </main>
+</Layout>

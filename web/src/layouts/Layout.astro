@@ -1,0 +1,314 @@
+---
+// web/src/layouts/Layout.astro
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "FlashProof Sales Popup for Woo – Live Sales Notification & Social Proof" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <!-- Dark Fullscreen Splash Preloader -->
+    <div id="site-preloader" class="preloader-overlay" aria-hidden="true">
+      <div class="preloader-center">
+        <!-- Circular Lightning Badge -->
+        <div class="bolt-circle">
+          <span class="bolt-icon">⚡</span>
+        </div>
+
+        <!-- Brand & Percentage Track -->
+        <div class="preloader-meta">
+          <span class="preloader-brand">FLASHPROOF</span>
+          <span class="preloader-count" id="preloader-num">0%</span>
+        </div>
+
+        <!-- Progress Bar Track -->
+        <div class="preloader-track">
+          <div class="preloader-fill" id="preloader-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ambient Blobs -->
+    <div class="wclsp-bg-canvas" aria-hidden="true">
+      <div class="wclsp-blob blob-1"></div>
+      <div class="wclsp-blob blob-2"></div>
+      <div class="wclsp-blob blob-3"></div>
+    </div>
+
+    <a href="#main-content" class="skip-to-content">Skip to content</a>
+    <slot />
+
+    <script is:inline>
+      (function() {
+        const overlay = document.getElementById('site-preloader');
+        const num = document.getElementById('preloader-num');
+        const bar = document.getElementById('preloader-bar');
+
+        let progress = 0;
+        let isLoaded = false;
+
+        // Smooth increment counter
+        const interval = setInterval(() => {
+          if (!isLoaded) {
+            // Gradually progress up to ~85-90% before the page load completes
+            if (progress < 88) {
+              progress += Math.floor(Math.random() * 8) + 3;
+              if (progress > 88) progress = 88;
+            }
+          } else {
+            // Once window.load triggers, quickly finish to 100%
+            progress += 8;
+            if (progress >= 100) {
+              progress = 100;
+              clearInterval(interval);
+              setTimeout(dismissPreloader, 180);
+            }
+          }
+
+          if (num) num.textContent = `${progress}%`;
+          if (bar) bar.style.width = `${progress}%`;
+        }, 35);
+
+        function dismissPreloader() {
+          if (!overlay) return;
+          overlay.classList.add('preloader-fade-out');
+          setTimeout(() => {
+            overlay.remove();
+          }, 450);
+        }
+
+        window.addEventListener('load', () => {
+          isLoaded = true;
+        });
+
+        // Failsafe safety fallback
+        setTimeout(() => {
+          isLoaded = true;
+        }, 1200);
+      })();
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", sans-serif;
+    --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    --color-text: #0f172a;
+    --color-text-muted: #64748b;
+    --color-primary: #4f46e5;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: var(--font-system);
+    background-color: #ffffff;
+    color: var(--color-text);
+    line-height: 1.6;
+    position: relative;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Fullscreen Preloader Splash */
+  .preloader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #0b0f19;
+    z-index: 9999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s ease;
+  }
+
+  .preloader-overlay.preloader-fade-out {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .preloader-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 240px;
+  }
+
+  /* Circular Badge with Rotating Gradient Ring */
+  .bolt-circle {
+    position: relative;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 22px;
+    background: radial-gradient(circle, #1a2234 0%, #0e1422 100%);
+    box-shadow: 0 0 25px rgba(245, 158, 11, 0.15);
+  }
+
+  .bolt-circle::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    padding: 2px;
+    background: conic-gradient(from 0deg, #f59e0b, #6366f1, transparent 60%, #f59e0b);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: rotateRing 2s linear infinite;
+  }
+
+  @keyframes rotateRing {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .bolt-icon {
+    font-size: 22px;
+    filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.7));
+  }
+
+  /* Label Row */
+  .preloader-meta {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-family: var(--font-mono);
+  }
+
+  .preloader-brand {
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 0.18em;
+  }
+
+  .preloader-count {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fbbf24;
+    letter-spacing: 0.05em;
+  }
+
+  /* Progress Bar */
+  .preloader-track {
+    width: 100%;
+    height: 3px;
+    background: #1e293b;
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  .preloader-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #38bdf8, #fbbf24);
+    border-radius: 9999px;
+    transition: width 0.08s ease-out;
+  }
+
+  /* Ambient Floating Blobs */
+  .wclsp-bg-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .wclsp-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.45;
+    animation: wclspFloat 14s infinite alternate ease-in-out;
+  }
+
+  .blob-1 {
+    width: 480px;
+    height: 480px;
+    background: radial-gradient(circle, #e0e7ff 0%, #c7d2fe 100%);
+    top: -10%;
+    left: -5%;
+  }
+
+  .blob-2 {
+    width: 520px;
+    height: 520px;
+    background: radial-gradient(circle, #fce7f3 0%, #fbcfe8 100%);
+    top: 30%;
+    right: -8%;
+    animation-duration: 18s;
+    animation-delay: -3s;
+  }
+
+  .blob-3 {
+    width: 440px;
+    height: 440px;
+    background: radial-gradient(circle, #fef3c7 0%, #fde68a 100%);
+    bottom: 0%;
+    left: 20%;
+    animation-duration: 12s;
+    animation-delay: -6s;
+  }
+
+  @keyframes wclspFloat {
+    0% { transform: translateY(0px) scale(1); }
+    50% { transform: translateY(35px) scale(1.08); }
+    100% { transform: translateY(-25px) scale(0.95); }
+  }
+
+  .skip-to-content {
+    position: absolute;
+    top: -9999px;
+    left: 20px;
+    background: var(--color-primary);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    z-index: 9999;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .skip-to-content:focus {
+    top: 20px;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+</style>
