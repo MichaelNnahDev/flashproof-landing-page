@@ -1,0 +1,28 @@
+---
+// web/src/components/portabletext/Link.astro
+const { node } = Astro.props;
+const href = node?.href || node?.markDef?.href || '';
+const isExternal = href.startsWith('http://') || href.startsWith('https://');
+---
+
+<a
+  href={href}
+  target={isExternal ? '_blank' : undefined}
+  rel={isExternal ? 'noopener noreferrer' : undefined}
+  class="prose-link"
+>
+  <slot />
+</a>
+
+<style>
+  .prose-link {
+    color: #38bdf8;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 500;
+    transition: color 0.15s ease;
+  }
+  .prose-link:hover {
+    color: #7dd3fc;
+  }
+</style>
