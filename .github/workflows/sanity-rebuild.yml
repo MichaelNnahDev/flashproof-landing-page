@@ -1,0 +1,24 @@
+name: Sanity Auto Rebuild Trigger
+
+on:
+  repository_dispatch:
+    types: [sanity-publish]
+  workflow_dispatch:
+
+jobs:
+  trigger-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Create Trigger Commit
+        run: |
+          git config --global user.name "Sanity Bot"
+          git config --global user.email "bot@michaelnnah.com"
+          echo "Last Sanity Publish: $(date -u)" > .sanity-build-trigger
+          git add .sanity-build-trigger
+          git commit -m "chore(sanity): trigger hostinger auto-rebuild [skip ci]" || echo "No changes"
+          git push origin main
