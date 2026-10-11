@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" fill="none">
+  <defs>
+    <linearGradient id="wpBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="wpBorderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#0369a1" stop-opacity="0.3"/>
+    </linearGradient>
+    <linearGradient id="wpBoltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7dd3fc"/>
+      <stop offset="45%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <filter id="wpGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#38bdf8" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Container Canvas -->
+  <rect width="256" height="256" rx="52" fill="url(#wpBgGrad)"/>
+  <rect x="2" y="2" width="252" height="252" rx="50" stroke="url(#wpBorderGrad)" stroke-width="3"/>
+
+  <!-- Shield Boundary -->
+  <path d="M128 32L54 60V118C54 174 88 214 128 230C168 214 202 174 202 118V60L128 32Z" 
+        fill="#111827" 
+        stroke="#1e293b" 
+        stroke-width="4" 
+        stroke-linejoin="round"/>
+
+  <!-- FlashProof Lightning Bolt -->
+  <path d="M136 68L86 132H128L112 200L170 128H128L136 68Z" 
+        fill="url(#wpBoltGrad)" 
+        filter="url(#wpGlow)" 
+        stroke="#ffffff" 
+        stroke-width="1.5" 
+        stroke-linejoin="round"/>
+</svg>
