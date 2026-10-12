@@ -13,4 +13,5 @@ export default defineCliConfig({
      */
     autoUpdates: true,
   },
+  studioHost: 'flashprooflp-studio'
 })
