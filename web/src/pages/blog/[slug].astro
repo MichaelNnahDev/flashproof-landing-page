@@ -47,6 +47,7 @@ const portableTextComponents = {
     <link rel="apple-touch-icon" href="/favicon.svg?v=2" />
     <meta charset="utf-8" />
     <title>{post?.title ? `${post.title} — FlashProof` : "FlashProof Blog"}</title>
+    <meta name="description" content={post?.metaDescription || post?.excerpt || post?.title || "FlashProof Sales Popup for Woo"} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
       :root {
@@ -312,12 +313,13 @@ const portableTextComponents = {
     </style>
   </head>
   <body>
-    <article class="container">
+    <main id="main-content">
+      <article class="container">
       <a href="/blog" class="back-nav">&larr; Back to all posts</a>
       <h1 class="post-title">{post?.title}</h1>
       {post?.coverImageUrl && (
         <div class="cover-wrapper">
-          <img src={post.coverImageUrl} alt={post.title} class="cover" loading="eager" />
+          <img src={post.coverImageUrl} alt={post?.coverImageAlt || post?.title} width="1200" height="630" class="cover" loading="eager" decoding="async" />
         </div>
       )}
       <div class="content">
@@ -351,5 +353,6 @@ const portableTextComponents = {
         </section>
       )}
     </article>
+    </main>
   </body>
 </html>
