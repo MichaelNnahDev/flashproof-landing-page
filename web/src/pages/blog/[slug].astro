@@ -12,13 +12,16 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 
-// Fetch current post
+// Fetch current post with alt text and meta description fallbacks
 const post = await sanityClient.fetch(
   `*[_type == "post" && slug.current == $slug][0]{
     title,
     body,
     publishedAt,
-    "coverImageUrl": mainImage.asset->url
+    excerpt,
+    metaDescription,
+    "coverImageUrl": mainImage.asset->url,
+    "coverImageAlt": mainImage.alt
   }`,
   { slug }
 );
@@ -168,7 +171,7 @@ const portableTextComponents = {
 
       .content :global(blockquote) {
         margin: 1.75em 0;
-        padding: 14px 20px;
+        padding: 16px 22px;
         border-left: 4px solid var(--color-accent);
         background-color: rgba(56, 189, 248, 0.05);
         border-radius: 0 8px 8px 0;
@@ -176,28 +179,66 @@ const portableTextComponents = {
         font-style: italic;
       }
 
-      .content :global(code) {
-        font-size: 0.88em;
-        background: #1e293b;
-        color: #38bdf8;
-        padding: 0.2em 0.4em;
-        border-radius: 4px;
-        word-break: break-word;
-      }
-
+      /* Code Blocks & Monospace Highlights */
       .content :global(pre) {
-        background: #0f172a;
-        padding: 16px 20px;
+        background: #030712 !important;
+        border: 1px solid #1e293b !important;
+        border-left: 4px solid #38bdf8 !important;
         border-radius: 8px;
+        padding: 18px 22px;
         overflow-x: auto;
-        border: 1px solid var(--color-border);
         margin: 1.75em 0;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
       }
 
       .content :global(pre code) {
-        background: transparent;
-        padding: 0;
-        color: #e2e8f0;
+        background: transparent !important;
+        padding: 0 !important;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+        font-size: 0.92rem !important;
+        line-height: 1.6 !important;
+        color: #7dd3fc !important;
+        display: block;
+      }
+
+      .content :global(:not(pre) > code) {
+        font-size: 0.88em;
+        background: #1e293b;
+        color: #38bdf8;
+        padding: 0.2em 0.45em;
+        border-radius: 4px;
+        border: 1px solid #334155;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        word-break: break-word;
+      }
+
+      /* Data Tables (for Benchmarks) */
+      .content :global(table) {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 2em 0;
+        font-size: 0.95rem;
+        background: #0f172a;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid var(--color-border);
+      }
+
+      .content :global(th),
+      .content :global(td) {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--color-border);
+      }
+
+      .content :global(th) {
+        background: #1e293b;
+        color: #f8fafc;
+        font-weight: 600;
+      }
+
+      .content :global(tr:last-child td) {
+        border-bottom: none;
       }
 
       /* Recent Articles Section */
@@ -315,44 +356,52 @@ const portableTextComponents = {
   <body>
     <main id="main-content">
       <article class="container">
-      <a href="/blog" class="back-nav">&larr; Back to all posts</a>
-      <h1 class="post-title">{post?.title}</h1>
-      {post?.coverImageUrl && (
-        <div class="cover-wrapper">
-          <img src={post.coverImageUrl} alt={post?.coverImageAlt || post?.title} width="1200" height="630" class="cover" loading="eager" decoding="async" />
+        <a href="/blog" class="back-nav">&larr; Back to all posts</a>
+        <h1 class="post-title">{post?.title}</h1>
+        {post?.coverImageUrl && (
+          <div class="cover-wrapper">
+            <img 
+              src={post.coverImageUrl} 
+              alt={post?.coverImageAlt || post?.title} 
+              width="1200" 
+              height="630" 
+              class="cover" 
+              loading="eager" 
+              decoding="async" 
+            />
+          </div>
+        )}
+        <div class="content">
+          <PortableText value={post?.body} components={portableTextComponents} />
         </div>
-      )}
-      <div class="content">
-        <PortableText value={post?.body} components={portableTextComponents} />
-      </div>
 
-      {recentPosts && recentPosts.length > 0 && (
-        <section class="recent-section">
-          <div class="recent-header">
-            <h2>Recent Articles</h2>
-            <a href="/blog" class="all-articles-link">View all &rarr;</a>
-          </div>
-          <div class="recent-grid">
-            {recentPosts.map((item) => (
-              <a href={`/blog/${item.slug}`} class="recent-card">
-                {item.coverImageUrl && (
-                  <div class="thumb-wrap">
-                    <img src={item.coverImageUrl} alt={item.title} loading="lazy" />
+        {recentPosts && recentPosts.length > 0 && (
+          <section class="recent-section">
+            <div class="recent-header">
+              <h2>Recent Articles</h2>
+              <a href="/blog" class="all-articles-link">View all &rarr;</a>
+            </div>
+            <div class="recent-grid">
+              {recentPosts.map((item) => (
+                <a href={`/blog/${item.slug}`} class="recent-card">
+                  {item.coverImageUrl && (
+                    <div class="thumb-wrap">
+                      <img src={item.coverImageUrl} alt={item.title} loading="lazy" />
+                    </div>
+                  )}
+                  <div class="recent-card-body">
+                    <time datetime={item.publishedAt}>
+                      {item.publishedAt ? new Date(item.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : ""}
+                    </time>
+                    <h3>{item.title}</h3>
+                    <span class="read-link">Read article &rarr;</span>
                   </div>
-                )}
-                <div class="recent-card-body">
-                  <time datetime={item.publishedAt}>
-                    {item.publishedAt ? new Date(item.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : ""}
-                  </time>
-                  <h3>{item.title}</h3>
-                  <span class="read-link">Read article &rarr;</span>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
-    </article>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+      </article>
     </main>
   </body>
 </html>
